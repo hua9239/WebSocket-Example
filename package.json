@@ -1,0 +1,23 @@
+{
+  "name": "websocket-chat-demo",
+  "version": "1.0.0",
+  "description": "A WebSocket chat application demonstrating bidirectional communication",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "websocket",
+    "chat",
+    "bidirectional-communication"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.0"
+  }
+}
