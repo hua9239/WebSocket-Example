@@ -147,21 +147,25 @@
             gap: 8px;
         }
 
-        input[type="text"] {
+        textarea {
             flex: 1;
             padding: 10px 12px;
             border: 1px solid #d1d5db;
             border-radius: 5px;
             font-size: 13px;
+            resize: vertical;
+            min-height: 44px;
+            max-height: 160px;
+            font-family: inherit;
         }
 
-        input[type="text"]:focus {
+        textarea:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
         }
 
-        input[type="text"]:disabled {
+        textarea:disabled {
             background: #f3f4f6;
             cursor: not-allowed;
         }
@@ -194,6 +198,11 @@
             background: #3b82f6;
             color: white;
         }
+
+        .message-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
     </style>
 </head>
 
@@ -215,7 +224,7 @@
                 <button id="disconnect" class="btn-disconnect" disabled>Disconnect</button>
             </div>
             <div class="input-row">
-                <input type="text" id="messageInput" placeholder="Enter message..." disabled>
+                <textarea id="messageInput" placeholder="Enter message... (Enter to send, Shift+Enter for newline)" disabled></textarea>
                 <button id="send" class="btn-send" disabled>Send</button>
             </div>
         </div>
@@ -235,8 +244,15 @@
         connectBtn.addEventListener('click', connect);
         disconnectBtn.addEventListener('click', disconnect);
         sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.isComposing) {
+                return;
+            }
+
+            if (e.key === 'Enter' && !e.shiftKey && !sendBtn.disabled) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
 
         function connect() {
@@ -281,8 +297,9 @@
         }
 
         function sendMessage() {
-            const content = messageInput.value.trim();
-            if (!content || !socket || socket.readyState !== WebSocket.OPEN) return;
+            const rawContent = messageInput.value;
+            const content = rawContent.replace(/\s+$/, '');
+            if (!content.trim() || !socket || socket.readyState !== WebSocket.OPEN) return;
 
             socket.send(JSON.stringify({
                 content: content,
